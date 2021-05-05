@@ -16,6 +16,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     
     // MARK: Properties
     
+    var justPlaying: String = "just playing"
     var dataController: DataController!
     fileprivate var _filteredTwitterUsernamesHandle: DatabaseHandle!
     fileprivate var _allTweetsHandle: DatabaseHandle!
