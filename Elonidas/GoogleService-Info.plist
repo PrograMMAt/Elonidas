@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>275163709660-8o958ah69bob3t72d8cbammba4094lon.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.275163709660-8o958ah69bob3t72d8cbammba4094lon</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD0eVs6tt8vBCmeoyy0ae7H7hb3Ra5xByA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>275163709660</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.levit8.Elonidas</string>
+	<key>PROJECT_ID</key>
+	<string>elonidas-231c5</string>
+	<key>STORAGE_BUCKET</key>
+	<string>elonidas-231c5.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:275163709660:ios:4a1517f3405919bf35f419</string>
+	<key>DATABASE_URL</key>
+	<string>https://elonidas-231c5-default-rtdb.europe-west1.firebasedatabase.app</string>
+</dict>
+</plist>
