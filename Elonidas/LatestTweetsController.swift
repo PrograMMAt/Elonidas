@@ -16,7 +16,6 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     
     // MARK: Properties
     
-    var justPlaying: String = "just playing"
     var dataController: DataController!
     fileprivate var _filteredTwitterUsernamesHandle: DatabaseHandle!
     fileprivate var _allTweetsHandle: DatabaseHandle!
@@ -115,14 +114,19 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
             }
             
             // load all tweets from Firebase that were already downloaded and saved, wait a bit so that you make sure you can ask variable tweets if there is really no data to show alert
-                loadTweetsFromFirebase(uid: uid) { (bool) in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        if self.tweets == [] {
-                            Alert.showAlert(viewController: self, title: "Alert", message: "There are no recent tweets that would meet your filters at the moment.", actionTitle: "OK", style: .default)
-                        }
+            _allTweetsHandle = dataController.ref.child("users").child("\(uid)").child("allTweets").queryOrdered(byChild: Constants.AllTweets.createdAt).observe(.value, with: { [self] snapshot in
+                
+                for child in snapshot.children {
+                    print("child is: \(child)")
+                    if let snap = child as? DataSnapshot {
+                        let dict = snap as [String:Any]
+                        let username = dict[Constants.AllTweets.username]
+                        let tweetId = dict[Constants.AllTweets.tweetId]
+                        let text = dict[Constants.AllTweets.text]
+                        let createdAt = dict[Constants.AllTweets.createdAt]
                     }
-
                 }
+            })
         }
     }
     
