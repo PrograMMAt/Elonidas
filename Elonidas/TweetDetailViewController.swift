@@ -13,7 +13,7 @@ class TweetDetailViewController: UIViewController {
     
     
     @IBOutlet weak var detailTweetTextView: UITextView!
-    var selectedTweet: DataSnapshot!
+    var selectedTweet: TweetDictionary!
     
     
     
@@ -22,8 +22,7 @@ class TweetDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let tweetData = selectedTweet.value as! [String:String]
-        let text = tweetData[Constants.AllTweets.text]
+        let text = selectedTweet.text
 
         detailTweetTextView.text = text
         adjustUITextViewHeight(arg: detailTweetTextView)

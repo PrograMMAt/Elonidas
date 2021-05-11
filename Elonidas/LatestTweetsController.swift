@@ -25,11 +25,14 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     var filteredTwitterUsernames: [DataSnapshot]! = []
     var filteredUsernames: [String] = []
     var tweets: [DataSnapshot]! = []
-    @IBOutlet weak var label: UILabel!
     let now = Date()
-    @IBOutlet var tweetsTableView: UITableView!
+    var tweetsArray: [TweetDictionary] = []
+    var isContentRefreshed: Bool = false
+    var tweetIds: [String] = []
     
     // MARK: Outlets
+    @IBOutlet weak var label: UILabel!
+    @IBOutlet var tweetsTableView: UITableView!
     @IBOutlet var tweetsTable: UITableView!
 
     // MARK: Life Cycle
@@ -98,7 +101,6 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
         if let uid = self.user?.uid {
             dataController.ref.child("users").child("\(uid)").child("filteredTwitterUsernames").removeObserver(withHandle: _filteredTwitterUsernamesHandle)
             dataController.ref.child("users").child("\(uid)").child("allTweets").queryOrdered(byChild: Constants.AllTweets.createdAt).removeObserver(withHandle: _allTweetsHandle)
-            dataController.ref.child("users").child("\(uid)").child("allTweets").queryOrdered(byChild: Constants.AllTweets.createdAt).removeObserver(withHandle: _allTweetsSecondLoad)
         }
         Auth.auth().removeStateDidChangeListener(_authHandle)
     }
@@ -114,21 +116,128 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
             }
             
             // load all tweets from Firebase that were already downloaded and saved, wait a bit so that you make sure you can ask variable tweets if there is really no data to show alert
-            _allTweetsHandle = dataController.ref.child("users").child("\(uid)").child("allTweets").queryOrdered(byChild: Constants.AllTweets.createdAt).observe(.value, with: { [self] snapshot in
+            _allTweetsHandle = dataController.ref.child("users").child("\(uid)").child("allTweets").queryOrdered(byChild: Constants.AllTweets.createdAt).observe(.childAdded, with: { [self] snapshot in
+                    print("allTweetsHandle triggered")
                 
-                for child in snapshot.children {
-                    print("child is: \(child)")
-                    if let snap = child as? DataSnapshot {
-                        let dict = snap as [String:Any]
-                        let username = dict[Constants.AllTweets.username]
-                        let tweetId = dict[Constants.AllTweets.tweetId]
-                        let text = dict[Constants.AllTweets.text]
-                        let createdAt = dict[Constants.AllTweets.createdAt]
+                
+                
+                
+                
+                if isContentRefreshed {
+                    print("first statement triggered")
+                    let dict = snapshot.value as! [String:Any]
+                    
+                    if let username = dict[Constants.AllTweets.username] as? String,
+                    let otweetId = dict[Constants.AllTweets.tweetId] as? String,
+                    let text = dict[Constants.AllTweets.text] as? String,
+                    let createdAt = dict[Constants.AllTweets.createdAt] as? String {
+                        let tweet = TweetDictionary(username: username, tweetId: otweetId, text: text, createdAt: createdAt)
+                            tweetsArray.append(tweet)
+                            let index = tweetsArray.firstIndex(where: { $0.tweetId == tweet.tweetId })
+                            print("index of new tweet is: \(index)")
+                            print("tweets array before Sorting: \(tweetsArray)")
+                            tweetsArray = tweetsArray.sorted(by: { $0.tweetId > $1.tweetId })
+                            print("Sorted \(tweetsArray)")
+                            let bIndex = tweetsArray.firstIndex(where: { $0.tweetId == tweet.tweetId })
+                            print("bIndex of the tweet is \(bIndex)")
+
+                        
+                        //self.tweetsArray.insert(tweet, at: 0)
+                        self.tableView.performBatchUpdates({
+                            self.tableView.insertRows(at: [IndexPath(row: bIndex!,section: 0)],with: .automatic)
+                        }, completion: nil)
                     }
+   
+                    
+                } else {
+                        print("else statement triggered")
+    
+                            
+                            
+                           
+                            let dict = snapshot.value as! [String:Any]
+                            
+                            if let username = dict[Constants.AllTweets.username] as? String,
+                            let otweetId = dict[Constants.AllTweets.tweetId] as? String,
+                            let text = dict[Constants.AllTweets.text] as? String,
+                            let createdAt = dict[Constants.AllTweets.createdAt] as? String {
+                                let tweet = TweetDictionary(username: username, tweetId: otweetId, text: text, createdAt: createdAt)
+                                self.tweetsArray.insert(tweet, at: 0)
+                                self.tableView.performBatchUpdates({
+                                    self.tableView.insertRows(at: [IndexPath(row: 0,section: 0)],with: .automatic)
+                                }, completion: nil)
+                            }
                 }
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
             })
         }
     }
+                    
+                    /*
+                    print("content Refreshed - all tweets Handle activated. ")
+                   print("snapshot is\(snapshot)")
+                       if let dict = snapshot.value as? [String:Any],
+                        let username = dict[Constants.AllTweets.username] as? String,
+                        let tweetId = dict[Constants.AllTweets.tweetId] as? String,
+                        let text = dict[Constants.AllTweets.text] as? String,
+                        let createdAt = dict[Constants.AllTweets.createdAt] as? String {
+                        let tweet = TweetDictionary(username: username, tweetId: tweetId, text: text, createdAt: createdAt)
+                        print("tweet adding to tweetsArray is:\(tweet)")
+                        self.tweetsArray.insert(tweet, at: 0)
+                        print("tweets array looks like: \(tweetsArray)")
+
+                        self.tableView.performBatchUpdates({
+                        self.tableView.insertRows(at: [IndexPath(row: 0,section: 0)],with: .automatic)
+                        }, completion: nil)
+                    }
+                     */
+                    
+                    
+                    /*
+                    for child in snapshot.children {
+                        
+                        print("child is: \(child)")
+                        if let snap = child as? DataSnapshot,
+                           let dict = snap.value as? [String:Any],
+                            let username = dict[Constants.AllTweets.username] as? String,
+                            let tweetId = dict[Constants.AllTweets.tweetId] as? String,
+                            let text = dict[Constants.AllTweets.text] as? String,
+                            let createdAt = dict[Constants.AllTweets.createdAt] as? String {
+                            if let tweetIdNumber = Int(tweetId) {
+                                let tweet = NewTweet(username: username, tweetId: tweetIdNumber, text: text, createdAt: createdAt)
+                                newTweetsArray.append(tweet)
+                            }
+                        }
+                    }
+                    print("newTweetsArray not sorted: \(newTweetsArray)")
+                    newTweetsArray.sorted(by: { $0.tweetId > $1.tweetId })
+                    print("Sorted \(newTweetsArray)")
+                    
+                    
+                    for tweet in newTweetsArray {
+                        let username = tweet.username
+                        let tweetId = String(tweet.tweetId)
+                        let text = tweet.text
+                        let createdAt = tweet.createdAt
+                        let tweet = TweetDictionary(username: username, tweetId: tweetId, text: text, createdAt: createdAt)
+                        tweetsArray.append(tweet)
+                    }
+                    tweetsTable.reloadData()
+                     */
+                
+
     
     func scrollToBottomTweet() {
         if tweets.count == 0 { return }
@@ -138,7 +247,11 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     
 
     @IBAction func refreshButtonTapped(_ sender: Any) {
-       loadFilteredTweetsFromTwitter()
+        isContentRefreshed = true
+        print("is content refreshed \(isContentRefreshed)")
+        print("!is content refreshed \(!isContentRefreshed)")
+        loadFilteredTweetsFromTwitter()
+        
     }
     @IBAction func refreshWithScroll(_ sender: Any) {
         loadFilteredTweetsFromTwitter()
@@ -152,22 +265,17 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     
 
     func loadFilteredTweetsFromTwitter() {
+        
+        var twArray: [NewTweet] = []
         if self.filteredTwitterUsernames == [] {
             DispatchQueue.main.async {
                 Alert.showAlert(viewController: self, title: "Alert", message: "There are no filters. Add some under Filters tab.", actionTitle: "OK", style: .default)
             }
         } else {
             DispatchQueue.main.async {
-                self.tweets = []
                 Spinner.start()
-                self.tweetsTable.reloadData()
             }
         if let uid = self.user?.uid {
-            dataController.ref.child("users").child("\(uid)").child("allTweets").queryOrdered(byChild: Constants.AllTweets.createdAt).removeObserver(withHandle: _allTweetsHandle)
-
-            // run a counter so that you know when last tweet was saved to Firebase, so that you can ask for ordered tweets from Firebase and they are already all there
-            var usernamesCounter = 0
-            var matchCounter = 0
             
             for usernameData in self.filteredTwitterUsernames {
                 // save the data from each username into variables
@@ -175,73 +283,62 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
                 let twUserId = usernameDictionary[Constants.Filters.twUserId] ?? ""
                 let twFilteredWord = usernameDictionary[Constants.Filters.filteredWord] ?? ""
                 let twUsername = usernameDictionary[Constants.Filters.twUsername] ?? ""
-                usernamesCounter += 1
                 
                 // get recent tweets from the user and loop over them
                 // note: not every request receives data, Twitter probably limits each API to ask for a recent tweets of a particular user
                 getRecentTweetsFromTwId(userId: twUserId) { (tweetsObject, error) in
                     if let error = error {
                         print("error was there when loading new tweets")
-                        self.loadTweetsFromFirebase(uid: uid) { bool in
-                            
-                        }
                         DispatchQueue.main.async {
                             Spinner.stop()
                             self.refreshControl?.endRefreshing()
                         }
 
                     } else {
-                        self.tweets = []
-                        var tweetsCounter = 0
-                        
+
                         for tweet in tweetsObject[0].data {
                             // save data for each tweet into variables
                                     let tweetId = tweet.id
-                                    let string = tweet.text
-                                    let stringResult = string.contains(twFilteredWord)
-                                    
-                                    tweetsCounter += 1
-
-                                    
-                                    // if tweet that is looped over contains filtered word, save the tweet into Firebase and add it to tweet Ids
-                                    if stringResult {
-                                        var data = [Constants.AllTweets.text: string]
-                                        data[Constants.AllTweets.tweetId] = tweetId
-                                        data[Constants.AllTweets.createdAt] = tweet.createdAt
-                                        data[Constants.AllTweets.username] = twUsername
-                                        self.dataController.ref.child("users").child("\(uid)").child("allTweets").child("\(tweetId)").setValue(data)
-                                        let idsData = ["id" : tweetId]
-                                        self.dataController.ref.child("users").child("\(uid)").child("tweetsIdsByUsernames").child("\(twUsername)").child("ids").child("\(tweetId)").setValue(idsData)
+                            
+                            if !self.tweetIds.contains(tweetId) {
+                                let string = tweet.text
+                                let stringResult = string.contains(twFilteredWord)
+                                
+                                
+                                // if tweet that is looped over contains filtered word, save the tweet into Firebase and add it to tweet Ids
+                                if stringResult {
+                                    print("contains twFilteredWord")
+                                    let username = twUsername
+                                    let createdAt = tweet.createdAt
+                                    if let tweetIdNumber = Int(tweetId) {
+                                        let tweet = NewTweet(username: username, tweetId: tweetIdNumber, text: string, createdAt: createdAt)
+                                        twArray.append(tweet)
+                                        print("twArray inside for in loop \(twArray)")
                                     }
-                                    
-                                    if tweetsCounter == tweetsObject[0].data.count {
-                                        matchCounter += 1
-                                        
-                                        // using delay to make sure all values are already set in Firebase db
-                                        if matchCounter == self.filteredTwitterUsernames.count {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                                self.tweets = []
-                                                self.tweetsTable.reloadData()
-                                                self._allTweetsHandle = self.dataController.ref.child("users").child("\(uid)").child("allTweets").queryOrdered(byChild: Constants.AllTweets.createdAt).observe(.childAdded, with: { [self] snapshot in
-                                                    self.tweets.append(snapshot)
-                                                    Spinner.stop()
-                                                    self.refreshControl?.endRefreshing()
-                                                    self.tweetsTable.insertRows(at: [IndexPath(row: self.tweets.count-1, section: 0)], with: .automatic)
-                                                    self.scrollToBottomTweet()
-                                                })
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                    if self.tweets == [] {
-                                                        Spinner.stop()
-                                                        self.refreshControl?.endRefreshing()
-                                                        Alert.showAlert(viewController: self, title: "Alert", message: "There are no recent tweets that would meet your filters at the moment.", actionTitle: "OK", style: .default)
 
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                }
+                            }
                         }
-
+                        print(twArray)
+                        
+                        let sortedArray = twArray.sorted(by: { $0.tweetId > $1.tweetId })
+                        print("sortedArray is: \(sortedArray)")
+                        
+                        for tweet in sortedArray {
+                            var data = [Constants.AllTweets.text: tweet.text]
+                            let tweetIdString = String(tweet.tweetId)
+                            data[Constants.AllTweets.tweetId] = tweetIdString
+                            data[Constants.AllTweets.createdAt] = tweet.createdAt
+                            data[Constants.AllTweets.username] = tweet.username
+                            self.dataController.ref.child("users").child("\(uid)").child("allTweets").child("\(tweetIdString)").setValue(data)
+                            let idsData = ["id" : tweetIdString]
+                            self.dataController.ref.child("users").child("\(uid)").child("tweetsIdsByUsernames").child("\(tweet.username)").child("ids").child("\(tweetIdString)").setValue(idsData)
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            Spinner.stop()
+                        }
+                        
+                        
                     }
                 }
             }
@@ -286,7 +383,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
         
     }
     
-    
+    /*
     func loadTweetsFromFirebase(uid: String, completion: @escaping (Bool) -> Void){
         self.tweets = []
         // get tweets sorted by time
@@ -296,7 +393,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
         })
         completion(true)
     }
-     
+     */
     
     
     @IBAction func signOutButtonTapped(_ sender: Any) {
@@ -315,27 +412,21 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         self.tweetsTable.rowHeight = UITableView.automaticDimension
         self.tweetsTable.estimatedRowHeight = 122.0
-        if tweets.count == 0 {
-            var textview = UITextView(frame: CGRect(x: 20, y: 100, width: 100, height: 100))
-            let window = UIWindow().addSubview(textview)
-        }
-        return tweets.count
+        return tweetsArray.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell! = tweetsTable.dequeueReusableCell(withIdentifier: "tweetCell", for: indexPath)
-        let tweetSnapshot: DataSnapshot! = tweets[indexPath.row]
-        let tweetData = tweetSnapshot.value as! [String:String]
-        let text = tweetData[Constants.AllTweets.text] ?? "[text]"
-        let twitterUsername = tweetData[Constants.AllTweets.username] ?? "username"
-        let time = tweetData[Constants.AllTweets.createdAt] ?? "[time]"
-        
+        let tweetData = tweetsArray[indexPath.row] as TweetDictionary
+        let text = tweetData.text
+        let twUsername = tweetData.username
+        let time = tweetData.createdAt
         let createdAt = self.transformISOStringToDate(isoString: time)
-        let timeAgo = createdAt?.timeAgoDisplay(now: now) ?? ""
-       
+        let timeAgo = createdAt?.timeAgoDisplay(now: now) ?? "createdAt"
+        print(text)
+        cell!.textLabel?.text = ("\(twUsername): ") + timeAgo + (" \(text)")
         
         
-        cell!.textLabel?.text = ("\(twitterUsername): ") + timeAgo + (" \(text)")
         return cell!
     }
     
@@ -348,7 +439,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
         // If this is a NotesListViewController, we'll configure its `Notebook`
         if let vc = segue.destination as? TweetDetailViewController {
             if let indexPath = tweetsTable.indexPathForSelectedRow {
-                vc.selectedTweet = tweets[indexPath.row]
+                vc.selectedTweet = tweetsArray[indexPath.row]
             }
         }
     }

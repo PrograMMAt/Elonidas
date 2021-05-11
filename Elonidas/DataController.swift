@@ -15,5 +15,6 @@ class DataController {
     }
     
     var filteredUsernames: [DataSnapshot] = []
+    var tweetsArray: []
     
 }

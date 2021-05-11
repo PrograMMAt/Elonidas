@@ -10,11 +10,11 @@ import Foundation
 
 
 
-struct Tweet {
-    let username = "username"
-    let tweetId = "tweetId"
-    let text = "text"
-    let createdAt = "createdAt"
+class TweetDictionary {
+    let username: String
+    let tweetId: String
+    let text: String
+    let createdAt: String
     
     
     init(username: String, tweetId: String, text: String, createdAt: String) {
@@ -23,4 +23,5 @@ struct Tweet {
         self.text = text
         self.createdAt = createdAt
     }
+
 }

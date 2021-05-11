@@ -77,6 +77,12 @@ class ActiveFiltersController: UIViewController {
                         DispatchQueue.main.async {
                             tableView.deleteRows(at: [indexPath], with: .automatic)
                         }
+                        
+                        
+                        //if let index:Int = self.array.index(where: {$0.id == temp.id && $0.deleted == true}) {
+                          //  self.array.remove(at: index)
+                        //}
+                        
                     }
                     else {
                         self.dataController.ref.child("users").child("\(uid)").child("filteredTwitterUsernames").child("\(username)").removeValue()
