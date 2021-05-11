@@ -14,7 +14,6 @@ class ActiveFiltersController: UIViewController {
     var dataController: DataController!
     var user: User?
     var filteredTwitterUsernames: [DataSnapshot] = []
-    var Ids: [String] = []
     
     @IBOutlet weak var filtersTableView: UITableView!
     
@@ -67,8 +66,12 @@ class ActiveFiltersController: UIViewController {
                         let snap = snapshot.value as! [String: Any]
                         
                         for id in snap.keys {
-                            self.Ids.append(id)
-                            self.dataController.ref.child("users").child("\(uid)").child("allTweets").child("\(id)").removeValue()
+                            let index = self.dataController.tweetsArray.firstIndex(where: { $0.tweetId == id })
+                            if let index = index {
+                                self.dataController.ref.child("users").child("\(uid)").child("allTweets").child("\(id)").removeValue()
+                                self.dataController.tweetsArray.remove(at: index)
+                            }
+
                         }
                         self.dataController.ref.child("users").child("\(uid)").child("tweetsIdsByUsernames").child("\(username)").removeValue()
                         self.dataController.ref.child("users").child("\(uid)").child("filteredTwitterUsernames").child("\(username)").removeValue()
@@ -78,6 +81,7 @@ class ActiveFiltersController: UIViewController {
                             tableView.deleteRows(at: [indexPath], with: .automatic)
                         }
                         
+                                                
                         
                         //if let index:Int = self.array.index(where: {$0.id == temp.id && $0.deleted == true}) {
                           //  self.array.remove(at: index)

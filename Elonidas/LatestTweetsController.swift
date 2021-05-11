@@ -26,7 +26,6 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     var filteredUsernames: [String] = []
     var tweets: [DataSnapshot]! = []
     let now = Date()
-    var tweetsArray: [TweetDictionary] = []
     var isContentRefreshed: Bool = false
     var tweetIds: [String] = []
     
@@ -132,17 +131,17 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
                     let text = dict[Constants.AllTweets.text] as? String,
                     let createdAt = dict[Constants.AllTweets.createdAt] as? String {
                         let tweet = TweetDictionary(username: username, tweetId: otweetId, text: text, createdAt: createdAt)
-                            tweetsArray.append(tweet)
-                            let index = tweetsArray.firstIndex(where: { $0.tweetId == tweet.tweetId })
+                        dataController.tweetsArray.append(tweet)
+                            let index = dataController.tweetsArray.firstIndex(where: { $0.tweetId == tweet.tweetId })
                             print("index of new tweet is: \(index)")
-                            print("tweets array before Sorting: \(tweetsArray)")
-                            tweetsArray = tweetsArray.sorted(by: { $0.tweetId > $1.tweetId })
-                            print("Sorted \(tweetsArray)")
-                            let bIndex = tweetsArray.firstIndex(where: { $0.tweetId == tweet.tweetId })
+                            print("tweets array before Sorting: \(dataController.tweetsArray)")
+                            dataController.tweetsArray = dataController.tweetsArray.sorted(by: { $0.tweetId > $1.tweetId })
+                            print("Sorted \(dataController.tweetsArray)")
+                            let bIndex = dataController.tweetsArray.firstIndex(where: { $0.tweetId == tweet.tweetId })
                             print("bIndex of the tweet is \(bIndex)")
 
                         
-                        //self.tweetsArray.insert(tweet, at: 0)
+                        //self.dataController.tweetsArray.insert(tweet, at: 0)
                         self.tableView.performBatchUpdates({
                             self.tableView.insertRows(at: [IndexPath(row: bIndex!,section: 0)],with: .automatic)
                         }, completion: nil)
@@ -162,7 +161,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
                             let text = dict[Constants.AllTweets.text] as? String,
                             let createdAt = dict[Constants.AllTweets.createdAt] as? String {
                                 let tweet = TweetDictionary(username: username, tweetId: otweetId, text: text, createdAt: createdAt)
-                                self.tweetsArray.insert(tweet, at: 0)
+                                self.dataController.tweetsArray.insert(tweet, at: 0)
                                 self.tableView.performBatchUpdates({
                                     self.tableView.insertRows(at: [IndexPath(row: 0,section: 0)],with: .automatic)
                                 }, completion: nil)
@@ -194,9 +193,9 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
                         let text = dict[Constants.AllTweets.text] as? String,
                         let createdAt = dict[Constants.AllTweets.createdAt] as? String {
                         let tweet = TweetDictionary(username: username, tweetId: tweetId, text: text, createdAt: createdAt)
-                        print("tweet adding to tweetsArray is:\(tweet)")
-                        self.tweetsArray.insert(tweet, at: 0)
-                        print("tweets array looks like: \(tweetsArray)")
+                        print("tweet adding to dataController.tweetsArray is:\(tweet)")
+                        self.dataController.tweetsArray.insert(tweet, at: 0)
+                        print("tweets array looks like: \(dataController.tweetsArray)")
 
                         self.tableView.performBatchUpdates({
                         self.tableView.insertRows(at: [IndexPath(row: 0,section: 0)],with: .automatic)
@@ -217,22 +216,22 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
                             let createdAt = dict[Constants.AllTweets.createdAt] as? String {
                             if let tweetIdNumber = Int(tweetId) {
                                 let tweet = NewTweet(username: username, tweetId: tweetIdNumber, text: text, createdAt: createdAt)
-                                newTweetsArray.append(tweet)
+                                newdataController.tweetsArray.append(tweet)
                             }
                         }
                     }
-                    print("newTweetsArray not sorted: \(newTweetsArray)")
-                    newTweetsArray.sorted(by: { $0.tweetId > $1.tweetId })
-                    print("Sorted \(newTweetsArray)")
+                    print("newdataController.tweetsArray not sorted: \(newdataController.tweetsArray)")
+                    newdataController.tweetsArray.sorted(by: { $0.tweetId > $1.tweetId })
+                    print("Sorted \(newdataController.tweetsArray)")
                     
                     
-                    for tweet in newTweetsArray {
+                    for tweet in newdataController.tweetsArray {
                         let username = tweet.username
                         let tweetId = String(tweet.tweetId)
                         let text = tweet.text
                         let createdAt = tweet.createdAt
                         let tweet = TweetDictionary(username: username, tweetId: tweetId, text: text, createdAt: createdAt)
-                        tweetsArray.append(tweet)
+                        dataController.tweetsArray.append(tweet)
                     }
                     tweetsTable.reloadData()
                      */
@@ -258,6 +257,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        tableView.reloadData()
         super.viewWillAppear(true)
         self.filteredTwitterUsernames = dataController.filteredUsernames
     }
@@ -412,12 +412,12 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         self.tweetsTable.rowHeight = UITableView.automaticDimension
         self.tweetsTable.estimatedRowHeight = 122.0
-        return tweetsArray.count
+        return dataController.tweetsArray.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell! = tweetsTable.dequeueReusableCell(withIdentifier: "tweetCell", for: indexPath)
-        let tweetData = tweetsArray[indexPath.row] as TweetDictionary
+        let tweetData = dataController.tweetsArray[indexPath.row] as TweetDictionary
         let text = tweetData.text
         let twUsername = tweetData.username
         let time = tweetData.createdAt
@@ -439,7 +439,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
         // If this is a NotesListViewController, we'll configure its `Notebook`
         if let vc = segue.destination as? TweetDetailViewController {
             if let indexPath = tweetsTable.indexPathForSelectedRow {
-                vc.selectedTweet = tweetsArray[indexPath.row]
+                vc.selectedTweet = dataController.tweetsArray[indexPath.row]
             }
         }
     }
