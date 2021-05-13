@@ -16,4 +16,5 @@ class DataController {
     
     var filteredUsernames: [DataSnapshot] = []
     var tweetsArray: [TweetDictionary] = []
+    var uid: String?
 }

@@ -45,6 +45,7 @@
 		4B796549260251D200EF6826 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		4B79654F2607D59600EF6826 /* myAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myAuth.swift; sourceTree = "<group>"; };
 		4B796553260B884000EF6826 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
+		4B7A063F264BD2A900D5AC8A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4B7D8F16264576DD0043E16A /* NewTweet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTweet.swift; sourceTree = "<group>"; };
 		4B7EFFDE26441ED600C0F28A /* TweetDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweetDictionary.swift; sourceTree = "<group>"; };
 		4B842D8D25FFB3CD00C43080 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -99,6 +100,7 @@
 		4B842D8125FFB3CD00C43080 = {
 			isa = PBXGroup;
 			children = (
+				4B7A063F264BD2A900D5AC8A /* README.md */,
 				4B842D8C25FFB3CD00C43080 /* Elonidas */,
 				4BFBB4A926015BA1009DCEF9 /* Elonidas.app */,
 				5200295B698D228ECC6332C0 /* Pods */,
