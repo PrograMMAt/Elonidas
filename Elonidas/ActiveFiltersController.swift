@@ -121,15 +121,14 @@ extension ActiveFiltersController: UITableViewDelegate, UITableViewDataSource {
         let filteredWord = dictionaryFromSnapshot[Constants.Filters.filteredWord] ?? ""
         cell.textLabel?.text = username + " - \"\(filteredWord)\""
         
+        cell.imageView?.image = UIImage(named: "ic_account_circle")
+
         
         if let imageUrl = dictionaryFromSnapshot[Constants.Filters.profileImageUrl] {
             // image already exists in cache
             print("imageURL is: \(imageUrl)")
             if let cachedImage = imageCache.object(forKey: imageUrl as NSString) {
-                
-                print(cell.imageView?.frame.width)
-                print(cell.imageView?.frame.height)
-                print(cachedImage)
+
                 cell.imageView?.image = cachedImage
                 cell.imageView?.setRounded()
                 cell.setNeedsLayout()
@@ -145,12 +144,8 @@ extension ActiveFiltersController: UITableViewDelegate, UITableViewDataSource {
                     // check if the cell is still on screen, if so, update cell image
                     if cell == tableView.cellForRow(at: indexPath) {
                         DispatchQueue.main.async {
-                            print(cell.imageView?.frame.width)
-                            print(cell.imageView?.frame.height)
-                            
+
                             cell.imageView?.frame = CGRect(x: 0, y: 0, width: 48, height: 48)
-                            print(cell.imageView?.frame.width)
-                            print(cell.imageView?.frame.height)
                             cell.imageView?.image = profileImage
                             cell.imageView?.setRounded()
                             cell.setNeedsLayout()
@@ -158,8 +153,6 @@ extension ActiveFiltersController: UITableViewDelegate, UITableViewDataSource {
                     }
                 })
             }
-        } else {
-         cell.imageView?.image = UIImage(named: "ic_account_circle")
         }
  
         
