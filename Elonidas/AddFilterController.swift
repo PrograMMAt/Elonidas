@@ -16,19 +16,24 @@ class AddFilterController: UIViewController, FUIAuthDelegate {
     var dataController: DataController!
     @IBOutlet weak var usernameTextField: UITextField!
     @IBOutlet weak var filterTextfield: UITextField!
-    var twUserId: String = ""
     var user: User = myAuth.user!
     var keyboardOnScreen = false
     @IBOutlet var dismissKeyboardRecognizer: UITapGestureRecognizer!
     @IBOutlet weak var addFilter: UIButton!
+    var storageRef: StorageReference!
+
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         usernameTextField.delegate = self
         filterTextfield.delegate = self
+        configureStorage()
     }
     
+    func configureStorage() {
+        storageRef = Storage.storage().reference()
+    }
 
     
     
@@ -42,20 +47,27 @@ class AddFilterController: UIViewController, FUIAuthDelegate {
                             Alert.showAlert(viewController: self, title: "Alert", message: "The username probably doesn't exist. Try a different one.", actionTitle: "OK", style: .default)
                         }
                     } else {
-                        guard let id = userData?.id else {
+                        guard let userData = userData else {
                             return
                         }
-                        self.twUserId = id
+                        
                         var data = [Constants.Filters.twUsername: username]
-                        data[Constants.Filters.twUserId] = self.twUserId
+                        data[Constants.Filters.twUserId] = userData.id
                         data[Constants.Filters.filteredWord] = filteredText
+                        let profileImageUrlString = userData.profileImageUrlString
                         
 
-                        self.dataController.ref.child("users").child("\(self.user.uid)").child("filteredTwitterUsernames").child("\(username)").setValue(data)
                         
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                           self.navigationController?.popViewController(animated: true)
+                        self.downloadImage(urlString: profileImageUrlString) { imageData in
+                            if let imageData = imageData {
+                                self.sendImageToStorageAndImageUrlToFirebase(imageData: imageData, username: username, tweetData: data)
+                            } else {
+                                self.dataController.ref.child("users").child("\(self.user.uid)").child("filteredTwitterUsernames").child("\(username)").setValue(data)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                   self.navigationController?.popViewController(animated: true)
+                                }
+
+                            }
                         }
                     }
 
@@ -65,6 +77,49 @@ class AddFilterController: UIViewController, FUIAuthDelegate {
         }
         
     }
+    
+    func downloadImage(urlString: String, completion: @escaping(_ image: Data?) -> Void){
+        
+        DispatchQueue.global(qos: .userInitiated).async { () -> Void in
+            
+            if let url = URL(string: urlString), let imgData = try? Data(contentsOf: url) {
+
+                DispatchQueue.main.async {
+                    completion(imgData)
+                }
+               
+            } else {
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+    func sendImageToStorageAndImageUrlToFirebase(imageData: Data, username: String, tweetData: [String:String]) {
+        
+        let imagePath = "filtered_users_photos/" + Auth.auth().currentUser!.uid + "/" + username + ".jpg"
+        // set content type to “image/jpeg” in firebase storage metadata
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        // create a child node at imagePath with imageData and metadata
+        storageRef!.child(imagePath).putData(imageData, metadata: metadata) { (metadata, error) in
+            if let error = error {
+                print("Error uploading: \(error)")
+                self.dataController.ref.child("users").child("\(self.user.uid)").child("filteredTwitterUsernames").child("\(username)").setValue(tweetData)
+                return
+            } else {
+                print("metadata is: \(metadata)")
+                var mData = tweetData
+                mData[Constants.Filters.profileImageUrl] = self.storageRef.child((metadata?.path)!).description
+                self.dataController.ref.child("users").child("\(self.user.uid)").child("filteredTwitterUsernames").child("\(username)").setValue(mData)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                   self.navigationController?.popViewController(animated: true)
+                }
+            }
+        }
+    }
+    
     
     
     @IBAction func tappedView(_ sender: Any) {

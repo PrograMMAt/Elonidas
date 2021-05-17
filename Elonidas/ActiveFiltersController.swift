@@ -14,9 +14,11 @@ class ActiveFiltersController: UIViewController {
     var dataController: DataController!
     var user: User?
     var filteredTwitterUsernames: [DataSnapshot] = []
+    var storageRef: StorageReference!
+    let imageCache = NSCache<NSString, UIImage>()
+    
     
     @IBOutlet weak var filtersTableView: UITableView!
-    
     
     
     override func viewDidLoad() {
@@ -26,6 +28,9 @@ class ActiveFiltersController: UIViewController {
         filtersTableView.delegate = self
         filtersTableView.dataSource = self
         filtersTableView.reloadData()
+        
+        self.filtersTableView.rowHeight = UITableView.automaticDimension
+        self.filtersTableView.estimatedRowHeight = 122.0
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -46,6 +51,10 @@ class ActiveFiltersController: UIViewController {
     
     @IBAction func addFilterButtonTapped(_ sender: Any) {
         performSegue(withIdentifier: "addFilter", sender: sender)
+    }
+    
+    func configureStorage() {
+        storageRef = Storage.storage().reference()
     }
 
     
@@ -98,7 +107,6 @@ class ActiveFiltersController: UIViewController {
 
 
 
-
 extension ActiveFiltersController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -106,12 +114,55 @@ extension ActiveFiltersController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = filtersTableView.dequeueReusableCell(withIdentifier: "filterCell", for: indexPath)
+        let cell = filtersTableView.dequeueReusableCell(withIdentifier: "filterCell", for: indexPath) as! CustomCell
         let snapshot = filteredTwitterUsernames[indexPath.row]
         let dictionaryFromSnapshot = snapshot.value as! [String:String]
         let username = dictionaryFromSnapshot[Constants.Filters.twUsername] ?? ""
         let filteredWord = dictionaryFromSnapshot[Constants.Filters.filteredWord] ?? ""
         cell.textLabel?.text = username + " - \"\(filteredWord)\""
+        
+        
+        if let imageUrl = dictionaryFromSnapshot[Constants.Filters.profileImageUrl] {
+            // image already exists in cache
+            print("imageURL is: \(imageUrl)")
+            if let cachedImage = imageCache.object(forKey: imageUrl as NSString) {
+                
+                print(cell.imageView?.frame.width)
+                print(cell.imageView?.frame.height)
+                print(cachedImage)
+                cell.imageView?.image = cachedImage
+                cell.imageView?.setRounded()
+                cell.setNeedsLayout()
+            } else {
+                // download image
+                Storage.storage().reference(forURL: imageUrl).getData(maxSize: INT64_MAX, completion: { (data, error) in
+                    guard error == nil else {
+                        print("Error downloading: \(error!)")
+                        return
+                    }
+                    let profileImage = UIImage.init(data: data!, scale: 1)
+                    self.imageCache.setObject(profileImage!, forKey: imageUrl as NSString)
+                    // check if the cell is still on screen, if so, update cell image
+                    if cell == tableView.cellForRow(at: indexPath) {
+                        DispatchQueue.main.async {
+                            print(cell.imageView?.frame.width)
+                            print(cell.imageView?.frame.height)
+                            
+                            cell.imageView?.frame = CGRect(x: 0, y: 0, width: 48, height: 48)
+                            print(cell.imageView?.frame.width)
+                            print(cell.imageView?.frame.height)
+                            cell.imageView?.image = profileImage
+                            cell.imageView?.setRounded()
+                            cell.setNeedsLayout()
+                        }
+                    }
+                })
+            }
+        } else {
+         cell.imageView?.image = UIImage(named: "ic_account_circle")
+        }
+ 
+        
         return cell
     }
     

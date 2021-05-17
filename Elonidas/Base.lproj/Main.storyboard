@@ -19,14 +19,43 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="gJH-0p-rhn">
                                 <rect key="frame" x="0.0" y="88" width="414" height="725"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="filterCell" id="iyA-C9-tuh">
-                                        <rect key="frame" x="0.0" y="24.5" width="414" height="43.5"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="filterCell" id="iyA-C9-tuh" customClass="CustomCell" customModule="Elonidas" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="24.5" width="414" height="58.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="iyA-C9-tuh" id="18P-V6-9iA">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="58.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="g7V-it-1sP">
+                                                    <rect key="frame" x="20" y="5" width="48" height="48.5"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="48" id="T3M-Xb-3Ua"/>
+                                                        <constraint firstAttribute="width" constant="48" id="bwx-MQ-C1K"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zm9-eX-JaT">
+                                                    <rect key="frame" x="78" y="29.5" width="0.0" height="0.0"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="zm9-eX-JaT" firstAttribute="trailing" secondItem="18P-V6-9iA" secondAttribute="trailing" constant="-336" id="BDP-Wc-Cod" userLabel="Label.trailing = trailing"/>
+                                                <constraint firstItem="zm9-eX-JaT" firstAttribute="top" secondItem="18P-V6-9iA" secondAttribute="top" constant="29.5" id="Rl1-t6-br3"/>
+                                                <constraint firstItem="g7V-it-1sP" firstAttribute="top" secondItem="18P-V6-9iA" secondAttribute="top" constant="5" id="ey8-kL-dED"/>
+                                                <constraint firstItem="g7V-it-1sP" firstAttribute="leading" secondItem="18P-V6-9iA" secondAttribute="leading" constant="20" id="rw8-V7-f3o"/>
+                                                <constraint firstAttribute="bottom" secondItem="g7V-it-1sP" secondAttribute="bottom" constant="5" id="ttZ-NT-oCO"/>
+                                                <constraint firstItem="zm9-eX-JaT" firstAttribute="leading" secondItem="g7V-it-1sP" secondAttribute="trailing" constant="10" id="zS4-3f-LNz"/>
+                                            </constraints>
                                         </tableViewCellContentView>
+                                        <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        <connections>
+                                            <outlet property="aImageView" destination="g7V-it-1sP" id="AOK-uk-MHg"/>
+                                            <outlet property="label" destination="zm9-eX-JaT" id="yr2-hx-rXa"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
@@ -54,7 +83,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1535" y="1509"/>
+            <point key="canvasLocation" x="1535" y="1520"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="dbY-7l-JI8">
@@ -74,7 +103,7 @@
             </objects>
             <point key="canvasLocation" x="-161" y="1124"/>
         </scene>
-        <!--Filtered Tweets-->
+        <!--Latest Tweets-->
         <scene sceneID="Ehx-LP-9Un">
             <objects>
                 <tableViewController id="yYi-hW-0uu" customClass="LatestTweetsController" customModule="Elonidas" customModuleProvider="target" sceneMemberID="viewController">
@@ -109,7 +138,7 @@
                             <outlet property="delegate" destination="yYi-hW-0uu" id="jeW-7s-OST"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Filtered Tweets" id="d0v-Zc-mzT">
+                    <navigationItem key="navigationItem" title="Latest Tweets" id="d0v-Zc-mzT">
                         <barButtonItem key="leftBarButtonItem" image="arrow.clockwise" catalog="system" id="1RL-ox-frE">
                             <connections>
                                 <action selector="refreshButtonTapped:" destination="yYi-hW-0uu" id="ado-qF-Lei"/>

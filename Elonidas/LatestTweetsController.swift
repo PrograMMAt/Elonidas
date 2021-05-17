@@ -5,8 +5,8 @@
 //  Created by Ondrej Winter on 15.03.2021.
 //
 
-import UIKit
 import Foundation
+import UIKit
 import Firebase
 import FirebaseUI
 import GoogleSignIn

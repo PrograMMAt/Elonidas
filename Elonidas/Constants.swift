@@ -13,6 +13,7 @@ struct Constants {
         static let twUsername = "twUsername"
         static let twUserId = "twUserId"
         static let filteredWord = "filteredWord"
+        static let profileImageUrl = "profileImageUrl"
     }
     
     struct AllTweets {
@@ -20,6 +21,5 @@ struct Constants {
         static let tweetId = "tweetId"
         static let text = "text"
         static let createdAt = "createdAt"
-        
     }
 }

@@ -23,13 +23,16 @@ class TwitterAPI {
         
         case getUserIdByUsername(String)
         case getRecentTweets(Int, String)
+        case getAProfilePicture(String)
         
         var stringValue: String {
             switch self {
             case .getUserIdByUsername(let username):
-                return Endpoints.base + "/users/by/username/\(username)" + "?user.fields=created_at"
+                return Endpoints.base + "/users/by/username/\(username)" + "?user.fields=created_at" + ",profile_image_url"
             case .getRecentTweets(let numberOfRecentTweets, let userId):
                 return Endpoints.base + "/users/" + userId + "/tweets?max_results=\(numberOfRecentTweets)" + "&tweet.fields=created_at"
+            case .getAProfilePicture(let id):
+            return Endpoints.base + "/users/" + id
             }
         }
         
@@ -39,6 +42,22 @@ class TwitterAPI {
         }
         
     }
+    
+    
+    
+    /*
+    class func getAProfilePicture(id: String) {
+        var request = URLRequest(url: Endpoints.getAProfilePicture(id).url, timeoutInterval: Double.infinity)
+        request.addValue(Auth.bearer, forHTTPHeaderField: "Authorization")
+        request.httpMethod = "GET"
+        
+        taskForGetRequest(request: request, responseType: <#T##Decodable.Protocol#>, rangeFrom: 0) { <#Decodable?#>, <#Error?#> in
+            
+        }
+        
+    }
+ 
+ */
 
 
     class func getUserIdByUsername(username:String, completion: @escaping(UserIdData?, Error?) -> Void) {
