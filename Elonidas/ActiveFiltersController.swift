@@ -31,6 +31,7 @@ class ActiveFiltersController: UIViewController {
         
         self.filtersTableView.rowHeight = UITableView.automaticDimension
         self.filtersTableView.estimatedRowHeight = 122.0
+        configureStorage()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -39,22 +40,20 @@ class ActiveFiltersController: UIViewController {
         filtersTableView.reloadData()
     }
     
+    func configureStorage() {
+        storageRef = Storage.storage().reference()
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if segue.identifier == "addFilter" {
-            
             let controller = segue.destination as! AddFilterController
-            
             controller.dataController = dataController
         }
     }
     
     @IBAction func addFilterButtonTapped(_ sender: Any) {
         performSegue(withIdentifier: "addFilter", sender: sender)
-    }
-    
-    func configureStorage() {
-        storageRef = Storage.storage().reference()
     }
 
     
@@ -84,6 +83,36 @@ class ActiveFiltersController: UIViewController {
                         }
                         self.dataController.ref.child("users").child("\(uid)").child("tweetsIdsByUsernames").child("\(username)").removeValue()
                         self.dataController.ref.child("users").child("\(uid)").child("filteredTwitterUsernames").child("\(username)").removeValue()
+                        let storageImagePath = "filtered_users_photos/" + Auth.auth().currentUser!.uid + "/" + username + "/" + username + ".jpg"
+                        print("storageImagePath is \(storageImagePath)")
+                        self.storageRef.child(storageImagePath).delete { error in
+                            if let error = error {
+                                // Uh-oh, an error occurred!
+                                print(error)
+                            } else {
+                                print("File deleted successfully")
+                            }
+                        }
+                        
+                        
+                        func deletingImageFromStorage(){
+                            let storage = Storage.storage()
+                            var storageRef = storage.reference()
+                            
+                            // Create a reference to the file we want to download
+                            storageRef = storageRef.child("images/car.jpg")
+                            
+                            storageRef.delete { error in
+                                if let error = error {
+                                    // Uh-oh, an error occurred!
+                                } else {
+                                    print("File deleted successfully")
+                                }
+                            }
+                            
+                        }
+                        
+                        
                         self.filteredTwitterUsernames.remove(at: indexPath.row)
                         self.dataController.filteredUsernames.remove(at: indexPath.row)
                         DispatchQueue.main.async {
@@ -92,9 +121,18 @@ class ActiveFiltersController: UIViewController {
                         
                     } else {
                         self.dataController.ref.child("users").child("\(uid)").child("filteredTwitterUsernames").child("\(username)").removeValue()
+                        let storageImagePath = "filtered_users_photos/" + Auth.auth().currentUser!.uid + "/" + username + "/" + username + ".jpg"
+                        print("storageImagePath is \(storageImagePath)")
+                        self.storageRef.child(storageImagePath).delete { error in
+                            if let error = error {
+                                // Uh-oh, an error occurred!
+                                print(error)
+                            } else {
+                                print("File deleted successfully")
+                            }
+                        }
                         self.filteredTwitterUsernames.remove(at: indexPath.row)
                         self.dataController.filteredUsernames.remove(at: indexPath.row)
-
                         DispatchQueue.main.async {
                             tableView.deleteRows(at: [indexPath], with: .automatic)
                         }
@@ -114,7 +152,7 @@ extension ActiveFiltersController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = filtersTableView.dequeueReusableCell(withIdentifier: "filterCell", for: indexPath) as! CustomCell
+        let cell = filtersTableView.dequeueReusableCell(withIdentifier: "filterCell", for: indexPath)
         let snapshot = filteredTwitterUsernames[indexPath.row]
         let dictionaryFromSnapshot = snapshot.value as! [String:String]
         let username = dictionaryFromSnapshot[Constants.Filters.twUsername] ?? ""

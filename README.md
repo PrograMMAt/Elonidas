@@ -24,10 +24,9 @@ Filtered Tweets page
 - when you click on a particular tweet it will take you to the detail of the tweet where you see jsut the text of the tweet
 
 
-
 Active Filters page
 - shows currently active filters 
-- each row shows username that is filtered and one word that should be "watched" (filtered)
+- each row shows a rounded picture of a user, username that is filtered and one word that should be "watched" (filtered)
 - on click plus button get to Add Filter page
 
 

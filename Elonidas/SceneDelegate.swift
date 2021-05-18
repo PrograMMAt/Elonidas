@@ -22,8 +22,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let tabBarController = window?.rootViewController as! UITabBarController
         let navigationController = tabBarController.viewControllers![0] as! UINavigationController
-        let latestNavigationController = navigationController.topViewController as! LatestTweetsController
-        latestNavigationController.dataController = dataController
+        let latestTweetsController = navigationController.topViewController as! LatestTweetsController
+        latestTweetsController.dataController = dataController
         let secondNavController = tabBarController.viewControllers![1] as! UINavigationController
         let addFilterController = secondNavController.topViewController as! ActiveFiltersController
         addFilterController.dataController = dataController
