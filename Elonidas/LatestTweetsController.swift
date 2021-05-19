@@ -11,7 +11,7 @@ import Firebase
 import FirebaseUI
 import GoogleSignIn
 
-class LatestTweetsController: UITableViewController, FUIAuthDelegate {
+class LatestTweetsController: UITableViewController, FUIAuthDelegate, UINavigationControllerDelegate {
     
     
     // MARK: Properties
@@ -41,6 +41,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     
     func configureAuth() {
         // create authUI and add providers
+        FUIAuth.defaultAuthUI()?.shouldHideCancelButton = true
         let authUI = FUIAuth.defaultAuthUI()
         authUI?.delegate = self
         let providers: [FUIAuthProvider] = [
@@ -51,6 +52,8 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
         
         
         // add listener if there was a change in the auth state, check if user variable on the view controller is the same as userAuth, if not - rewrite it, if there was no userAuth, present AuthUIVC
+    
+        
         _authHandle = Auth.auth().addStateDidChangeListener({ (auth, userAuth) in
             self.tweets.removeAll(keepingCapacity: false)
             self.filteredTwitterUsernames.removeAll(keepingCapacity: false)
@@ -66,6 +69,12 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
                 self.signedInStatus(isSignedIn: false)
             }
         })
+    }
+    
+    func authUI(_ authUI: FUIAuth, didSignInWith user: User?, error: Error?) {
+        if let error = error {
+            Alert.showAlert(viewController: self, title: "Alert", message: error.localizedDescription, actionTitle: "OK", style: .default)
+        }
     }
     
     // hepler function for authorization
@@ -85,6 +94,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
         } else {
             let authUI = FUIAuth.defaultAuthUI()
             let authViewController = authUI!.authViewController()
+            authViewController.modalPresentationStyle = .fullScreen
             self.present(authViewController, animated: true, completion: nil)
         }
     }
@@ -163,6 +173,7 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
                 getRecentTweetsFromTwId(userId: twUserId) { (tweetsObject, error) in
                     if let error = error {
                         self.isLoadingTweets(isLoading: false)
+                        Alert.showAlert(viewController: self, title: "Alert", message: error.localizedDescription, actionTitle: "OK", style: .default)
                     } else {
 
                         for tweet in tweetsObject[0].data {
@@ -305,8 +316,6 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate {
     }
     
     
-    
-    
     // MARK: Table View functions
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -372,6 +381,4 @@ extension Date {
 
     
 }
-
-
 

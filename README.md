@@ -34,20 +34,15 @@ Add Filter page
 - there are two textfields, one for username and one for word, you want to filter
 - on Add Filter button click, save the filter and get back to Active Filters, where show the new filter as well
 - if the username doesn't exist it on Twitter it shows alert
-
-
-
-
-
-
-
-
-
-
-
-
-
 - if there is no data - show alert
 
 
+
+
+Installation
+To run this app you will have to first install cocoapods through the terminal
+Open a terminal window, and $ cd into your project directory.
+Run $ pod install
+
+if you have any troubles check the official website: https://guides.cocoapods.org/using/using-cocoapods.html
 

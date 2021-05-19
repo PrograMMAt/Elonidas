@@ -84,33 +84,12 @@ class ActiveFiltersController: UIViewController {
                         self.dataController.ref.child("users").child("\(uid)").child("tweetsIdsByUsernames").child("\(username)").removeValue()
                         self.dataController.ref.child("users").child("\(uid)").child("filteredTwitterUsernames").child("\(username)").removeValue()
                         let storageImagePath = "filtered_users_photos/" + Auth.auth().currentUser!.uid + "/" + username + "/" + username + ".jpg"
-                        print("storageImagePath is \(storageImagePath)")
                         self.storageRef.child(storageImagePath).delete { error in
                             if let error = error {
-                                // Uh-oh, an error occurred!
                                 print(error)
-                            } else {
-                                print("File deleted successfully")
                             }
                         }
                         
-                        
-                        func deletingImageFromStorage(){
-                            let storage = Storage.storage()
-                            var storageRef = storage.reference()
-                            
-                            // Create a reference to the file we want to download
-                            storageRef = storageRef.child("images/car.jpg")
-                            
-                            storageRef.delete { error in
-                                if let error = error {
-                                    // Uh-oh, an error occurred!
-                                } else {
-                                    print("File deleted successfully")
-                                }
-                            }
-                            
-                        }
                         
                         
                         self.filteredTwitterUsernames.remove(at: indexPath.row)
@@ -122,13 +101,11 @@ class ActiveFiltersController: UIViewController {
                     } else {
                         self.dataController.ref.child("users").child("\(uid)").child("filteredTwitterUsernames").child("\(username)").removeValue()
                         let storageImagePath = "filtered_users_photos/" + Auth.auth().currentUser!.uid + "/" + username + "/" + username + ".jpg"
-                        print("storageImagePath is \(storageImagePath)")
                         self.storageRef.child(storageImagePath).delete { error in
                             if let error = error {
                                 // Uh-oh, an error occurred!
                                 print(error)
                             } else {
-                                print("File deleted successfully")
                             }
                         }
                         self.filteredTwitterUsernames.remove(at: indexPath.row)
@@ -164,7 +141,6 @@ extension ActiveFiltersController: UITableViewDelegate, UITableViewDataSource {
         
         if let imageUrl = dictionaryFromSnapshot[Constants.Filters.profileImageUrl] {
             // image already exists in cache
-            print("imageURL is: \(imageUrl)")
             if let cachedImage = imageCache.object(forKey: imageUrl as NSString) {
 
                 cell.imageView?.image = cachedImage
