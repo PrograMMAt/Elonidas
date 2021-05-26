@@ -91,6 +91,11 @@ class LatestTweetsController: UITableViewController, FUIAuthDelegate, UINavigati
             format.dateFormat = "yyyy-MM-dd HH:mm:ss"
             let timestamp = format.string(from: date)
             
+            let rule = Rule(value: "from:elonmusk tesla", tag: "elonmusk tesla")
+            let rules = Rules(add: [rule])
+
+            TwitterAPI.postRulesToTwitter(body: rules)
+            
         } else {
             let authUI = FUIAuth.defaultAuthUI()
             let authViewController = authUI!.authViewController()

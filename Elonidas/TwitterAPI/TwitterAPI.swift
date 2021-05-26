@@ -24,6 +24,7 @@ class TwitterAPI {
         case getUserIdByUsername(String)
         case getRecentTweets(Int, String)
         case getAProfilePicture(String)
+        case postRulesToTwitter
         
         var stringValue: String {
             switch self {
@@ -32,7 +33,9 @@ class TwitterAPI {
             case .getRecentTweets(let numberOfRecentTweets, let userId):
                 return Endpoints.base + "/users/" + userId + "/tweets?max_results=\(numberOfRecentTweets)" + "&tweet.fields=created_at"
             case .getAProfilePicture(let id):
-            return Endpoints.base + "/users/" + id
+                return Endpoints.base + "/users/" + id
+            case .postRulesToTwitter:
+                return Endpoints.base + "/tweets/search/stream/rules"
             }
         }
         
@@ -58,6 +61,31 @@ class TwitterAPI {
     }
  
  */
+    
+    class func postRulesToTwitter(body: Rules) {
+        
+        var request = URLRequest(url: Endpoints.postRulesToTwitter.url)
+        request.addValue("Bearer AAAAAAAAAAAAAAAAAAAAAPCbNgEAAAAA1JO5dkebDHIX6F%2Be0PiT%2FqssDkE%3DOmLP8dUNKQ115dqAnznlmx5VeDUi4oXJ70GKBm3yYJu5vwS3Ag", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try! JSONEncoder().encode(body)
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data else {
+                print(error)
+                return
+            }
+            print(String(data: data, encoding: .utf8)!)
+        }
+        task.resume()
+        
+        
+        
+    }
+    
+    
+    
+    
 
 
     class func getUserIdByUsername(username:String, completion: @escaping(UserIdData?, Error?) -> Void) {
@@ -125,6 +153,38 @@ class TwitterAPI {
             
         }
         task.resume()
+    }
+    
+    
+    class func taskForPostRequest<RequestType: Encodable, ResponseType: Decodable> (url: URL, body: RequestType, responseType: ResponseType.Type, completion: @escaping(ResponseType?,Error?) -> Void) {
+        
+        var request = URLRequest(url: url)
+        request.addValue("Bearer AAAAAAAAAAAAAAAAAAAAAPCbNgEAAAAA1JO5dkebDHIX6F%2Be0PiT%2FqssDkE%3DOmLP8dUNKQ115dqAnznlmx5VeDUi4oXJ70GKBm3yYJu5vwS3Ag", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try! JSONEncoder().encode(body)
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    completion(nil,error)
+                }
+                return
+            }
+            
+            do {
+                let jsonObject = try JSONDecoder().decode(ResponseType.self, from: data)
+                DispatchQueue.main.async {
+                    completion(jsonObject,nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(nil,error)
+                }
+            }
+        }
+        task.resume()
+        
     }
     
 
