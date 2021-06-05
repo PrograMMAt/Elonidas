@@ -1,6 +1,6 @@
 # Elonidas App
 
-
+This is my own project.
 The app lets people create their own filters for recent tweets from particular Twitter users.
 For example you can only see Tweets from Elon Musk, that contain word "Tesla" and see it in your own filtered feed so that you don't have to go through other stuff you are not interested as a user.
 
